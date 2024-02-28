@@ -39,5 +39,6 @@ def scan_map():
     return nrow, ncol, map
 
 
+
 if __name__ == '__main__':
     main()

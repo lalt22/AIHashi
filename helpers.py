@@ -15,8 +15,8 @@ class Island:
         self.bridgeCount = 0
         self.neighbours = []
 
-    def addBridge(self):
-        self.bridgeCount+=1
+    def changeBridgeCount(self, planks):
+        self.bridgeCount += planks
 
     def isComplete(self):
         if (self.bridgeCount == self.maxBridges):
@@ -105,7 +105,7 @@ class Game:
     def canBridgeIslands(self, islandA:Island, islandB:Island):
         pass
 
-    def addBridge(self, islandA:Island, islandB:Island):
+    def addBridge(self, islandA:Island, islandB:Island, weight:int):
         #Check direction of bridge
         if (islandA.row == islandB.row):
             direction = "horizontal"
@@ -116,31 +116,39 @@ class Game:
             #Check whether going left or right
             if (islandA.col > islandB.col):
                 #Going left
-                self.drawBridges(islandA.col - 1, islandB.col, islandA.row, -1, direction)
+                self.drawBridges(islandA.col - 1, islandB.col, islandA.row, -1, direction, weight)
+                islandA.changeBridgeCount(weight)
+                islandB.changeBridgeCount(weight)
             else:
                 #going right
-                self.drawBridges(islandA.col + 1, islandB.col, islandA.row, 1, direction)
+                self.drawBridges(islandA.col + 1, islandB.col, islandA.row, 1, direction, weight)
+                islandA.changeBridgeCount(weight)
+                islandB.changeBridgeCount(weight)
         if (direction == "vertical"):
             if (islandA.row > islandB.row):
                 #Going up
-                self.drawBridges(islandA.row - 1, islandB.row, islandA.col, -1, direction)
+                self.drawBridges(islandA.row - 1, islandB.row, islandA.col, -1, direction, weight)
+                islandA.changeBridgeCount(weight)
+                islandB.changeBridgeCount(weight)
             else:
                 #going down
-                self.drawBridges(islandA.row + 1, islandB.row, islandA.col, 1, direction)
+                self.drawBridges(islandA.row + 1, islandB.row, islandA.col, 1, direction, weight)
+                islandA.changeBridgeCount(weight)
+                islandB.changeBridgeCount(weight)
 
         pass
 
-    def drawBridges(self, start, end, const, step, direction):
+    def drawBridges(self, start, end, const, step, direction, weight):
         if (direction == "horizontal"):
             for col in range(start, end, step):
                 ocean = self.getOceanAtCoord(const, col)
                 if (ocean != None):
-                    ocean.addBridge(Bridge(1, const, col, direction))
+                    ocean.addBridge(Bridge(weight, const, col, direction))
         else:
             for row in range(start, end, step):
                 ocean = self.getOceanAtCoord(row, const)
                 if (ocean != None):
-                    ocean.addBridge(Bridge(1, row, const, direction))
+                    ocean.addBridge(Bridge(weight, row, const, direction))
 
 
     def isGameComplete(self):

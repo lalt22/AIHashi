@@ -1,9 +1,9 @@
 # from typing import List
-from helpers import Island, Ocean, Game, makeGame
+from helpers import makeGame
 
 
 game = makeGame()
 
-game.show_game()
+game.show_game([], False)
 game.solve()
-game.show_game()
+# game.show_game()

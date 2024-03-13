@@ -19,6 +19,7 @@
 */
 int is_island(char ch)
 {
+    printf("Checking if is island\n");
     return ((ch >= '1' && ch <= '9') || (ch >= 'a' && ch <= 'c'));
 }
 
@@ -78,8 +79,10 @@ void scan_map(
 
     while ((ch = getc(fp)) != EOF)
     {
+        // printf("Checking char\n");
         if (ch == '\n')
         {
+            printf("Found newline\n");
             if (c >= *p_ncol)
             {
                 *p_ncol = c;
@@ -89,8 +92,10 @@ void scan_map(
         }
         else
         {
+            printf("Not a newline\n");
             if (*p_row0 < 0 && is_island(ch))
             {
+                printf("FOUND ISLAND\n");
                 *p_row0 = r;
                 *p_col0 = c;
             }
@@ -202,19 +207,19 @@ int main(int argc, char *argv[])
     int nrow, ncol;
     int row0 = -1, col0 = 0; // co-ordinates of top left island
     int r, c;
-
     if (argc < 2)
     {
         printf("Usage: %s sX.in < sX.out\n", argv[0]);
         return 0;
     }
+    printf("HERE");
     fp = fopen(argv[1], "r");
     if (fp == NULL)
     {
         printf("Failed to open file: %s\n", argv[1]);
         return 0;
     }
-
+    printf("Scanning map");
     scan_map(fp, &nrow, &ncol, &row0, &col0, map);
 
     scan_solution(stdin, nrow, ncol, row0, col0, map, soln);

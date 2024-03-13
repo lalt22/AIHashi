@@ -1,9 +1,6 @@
-# from typing import List
+#!/usr/bin/python3
 from helpers import makeGame
 
-
 game = makeGame()
-
-game.show_game([], False)
 game.solve()
 # game.show_game()

@@ -91,17 +91,23 @@ from helpers import makeGame, Game, Island, Bridge
  .  6  .  .  7  .  6
 '''
 
-big_game = Game(7,7, [
-    Island(1,1,3),
-    Island(1,4,7),
-    Island(1,6,4),
-    Island(4,1,8),
-    Island(4,4,8),
-    Island(4,6,5),
-    Island(6,1,6),
-    Island(6,4,7),
-    Island(6,6,6)
-])
+# big_game = Game(7,7, [
+#     Island(1,1,3),
+#     Island(1,4,7),
+#     Island(1,6,4),
+#     Island(4,1,8),
+#     Island(4,4,8),
+#     Island(4,6,5),
+#     Island(6,1,6),
+#     Island(6,4,7),
+#     Island(6,6,6)
+# ])
 
-big_game.show_game([], False)
-big_game.solve()
+# big_game.show_game([], False)
+# big_game.solve()
+
+info_test = Game(3,3, [
+    Island(0,0,3),
+    Island(0,2,3)
+])
+info_test.solve()

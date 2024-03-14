@@ -7,7 +7,7 @@ import logging
 import timeit
 import time
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARN)
 logger = logging.getLogger("Game")
 
 '''
@@ -23,6 +23,7 @@ class Island:
         self.col = col
         self.maxBridges = maxBridges
         self.neighbours: List[Island] = []
+        self.bridges = {}
 
     def show(self):
         if (self.maxBridges == 10):
@@ -108,7 +109,7 @@ class Game:
         # islands: List[Island] = self.sort_islands_by_constraints(self.islands, [])
         start = time.process_time()
         solved, bridges = self.solve_it(self.islands, [])
-        print(f"Time: {time.process_time() - start}")
+        logging.debug(f"Time: {time.process_time() - start}")
         if solved:
             self.show_game(bridges)
         else:
@@ -120,12 +121,12 @@ class Game:
             return True, built_bridges
 
         for i, island in enumerate(remaining_islands):
-            if (logging.root.level <= logging.DEBUG):
-                logging.debug(f"Checking permutations at island {island.maxBridges}: ({island.row},{island.col})")
-                logging.debug("[")
+            if (logging.root.level <= logging.INFO):
+                logging.info(f"Checking permutations at island {island.maxBridges}: ({island.row},{island.col})")
+                logging.info("[")
                 for bridge in built_bridges:
-                    logging.debug(f"[From: ({bridge.from_island.row},{bridge.from_island.col}) -> {bridge.count} -> To: ({bridge.to_island.row},{bridge.to_island.col})] , ")
-                logging.debug("]")
+                    logging.info(f"[From: ({bridge.from_island.row},{bridge.from_island.col}) -> {bridge.count} -> To: ({bridge.to_island.row},{bridge.to_island.col})] , ")
+                logging.info("]")
 
             start = time.process_time()
             possible_perms = self.get_island_permutations(island, built_bridges)
@@ -138,7 +139,9 @@ class Game:
             out = time.process_time()
             # if (out - start > 0.0):
             #     # print(f"Time in island bridges: {out - start}")
+
             #If no possible bridges, backtrack. every island must be able to build or already have at least one bridge
+            logging.info(f"Invalid path made to {island.maxBridges}: ({island.row}, {island.col}). Backtracking")
             if len(possible_bridges) == 0 and self.get_number_of_bridges_at_island(island, built_bridges) < island.maxBridges:
                 return False, []
 
@@ -302,8 +305,8 @@ class Game:
         return perms
 
     def get_number_of_bridges_at_island(self, island:Island, built_bridges: List[Bridge]) -> int:
-        attached_bridges = [bridge for bridge in built_bridges if (bridge.to_island == island or bridge.from_island == island)]
-        count = sum(bridge.count for bridge in attached_bridges)
+        count = sum([bridge.count for bridge in built_bridges if (bridge.to_island == island or bridge.from_island == island)])
+        # count = sum(bridge.count for bridge in attached_bridges)
         return count
 
     def get_unfilled_neighbours_count(self, island:Island, built_bridges: List[Bridge]) -> int:
@@ -344,8 +347,7 @@ class Game:
             if (island not in sortedIslands):
                 sortedIslands.append(island)
         for island in sortedIslands:
-            print(f"{island.maxBridges}:({island.row}, {island.col})", end=" ")
-        print()
+            logging.debug(f"{island.maxBridges}:({island.row}, {island.col})")
         return sortedIslands
 
     def isGameComplete(self, bridges: List[Bridge]):

@@ -4,7 +4,6 @@ from __future__ import annotations
 from scan_print_map import scan_map
 from typing import Generator, List
 import logging
-import timeit
 import time
 
 logging.basicConfig(level=logging.WARN)
@@ -18,22 +17,22 @@ Attributes:
 - neighbours - list of x,y adjacent neighbours. max length = 4
 '''
 class Island:
-    def __init__(self, row:int, col:int, maxBridges:int):
+    def __init__(self, row:int, col:int, max_bridges:int):
         self.row = row
         self.col = col
-        self.maxBridges = maxBridges
+        self.max_bridges = max_bridges
         self.neighbours: List[Island] = []
         self.bridges = {}
 
     def show(self):
-        if (self.maxBridges == 10):
+        if (self.max_bridges == 10):
             print("a", end="")
-        elif (self.maxBridges == 11):
+        elif (self.max_bridges == 11):
             print("b", end="")
-        elif (self.maxBridges == 12):
+        elif (self.max_bridges == 12):
             print("c", end="")
         else:
-            print(f"{self.maxBridges}", end="")
+            print(f"{self.max_bridges}", end="")
 
     def __eq__(self, other: Island):
         return self.row == other.row and self.col == other.col
@@ -100,16 +99,13 @@ class Game:
                     else:
                         print(" ", end="")
                         row_empty = False
-            # logger.debug("ROW EMPTY")
             if (not row_empty):
                 print("\n", end="")
     def solve(self):
-        logger.debug("I AM HERE!")
         self.getNeighbours()
-        # islands: List[Island] = self.sort_islands_by_constraints(self.islands, [])
         start = time.process_time()
         solved, bridges = self.solve_it(self.islands, [])
-        logging.debug(f"Time: {time.process_time() - start}")
+        logging.info(f"Time: {time.process_time() - start}")
         if solved:
             self.show_game(bridges)
         else:
@@ -122,27 +118,20 @@ class Game:
 
         for i, island in enumerate(remaining_islands):
             if (logging.root.level <= logging.INFO):
-                logging.info(f"Checking permutations at island {island.maxBridges}: ({island.row},{island.col})")
+                logging.info(f"Checking permutations at island {island.max_bridges}: ({island.row},{island.col})")
                 logging.info("[")
                 for bridge in built_bridges:
                     logging.info(f"[From: ({bridge.from_island.row},{bridge.from_island.col}) -> {bridge.count} -> To: ({bridge.to_island.row},{bridge.to_island.col})] , ")
                 logging.info("]")
 
-            start = time.process_time()
             possible_perms = self.get_island_permutations(island, built_bridges)
-            out = time.process_time()
-            # if (out - start > 0.0):
-            #     print(f"Time in island permutations: {out - start}")
 
-            start = time.process_time()
             possible_bridges = self.get_possible_island_bridges(island, possible_perms, built_bridges)
-            out = time.process_time()
-            # if (out - start > 0.0):
-            #     # print(f"Time in island bridges: {out - start}")
 
-            #If no possible bridges, backtrack. every island must be able to build or already have at least one bridge
-            logging.info(f"Invalid path made to {island.maxBridges}: ({island.row}, {island.col}). Backtracking")
-            if len(possible_bridges) == 0 and self.get_number_of_bridges_at_island(island, built_bridges) < island.maxBridges:
+            logging.info(f"{len(possible_bridges)} possible bridges found")
+
+            if len(possible_bridges) == 0 and self.get_number_of_bridges_at_island(island, built_bridges) < island.max_bridges:
+                logging.info(f"Invalid path made to {island.max_bridges}: ({island.row}, {island.col}). Backtracking")
                 return False, []
 
             for bridges in possible_bridges:
@@ -216,11 +205,6 @@ class Game:
             return possible_bridge[0]
         else:
             return None
-        # for bridge in bridges:
-        #     if ((bridge.to_island == islandA and bridge.from_island == islandB) or \
-        #         (bridge.from_island == islandA and bridge.to_island == islandB)):
-        #         return bridge
-        # return None
 
     def get_possible_island_bridges(self, island: Island, possible_perms: List[List[int]], existing_bridges: List[Bridge]) -> List[List[Bridge]]:
         possible_bridges: List[List[Bridge]] = []
@@ -246,14 +230,14 @@ class Game:
                             perm_bridges.append(new_bridge)
                         else:
                             break
-                if (len(perm_bridges) > 0):
-                    if ([perm_bridges not in possible_bridges]):
-                        possible_bridges.append(perm_bridges)
+            if (len(perm_bridges) > 0):
+                if ([perm_bridges not in possible_bridges]):
+                    possible_bridges.append(perm_bridges)
         return possible_bridges
 
     def can_add_bridge_with_weight(self, island: Island, weight: int, existing_bridges: List[Bridge]) -> bool:
         count = self.get_number_of_bridges_at_island(island, existing_bridges)
-        return (count + weight <= island.maxBridges)
+        return (count + weight <= island.max_bridges)
 
     def get_permutations_to_sum(self, sum: int, num_neighbours: int, perms: List[List[int]]) -> Generator[list[int]]:
         #Given n number of neighbours, find all permutations of length n that add up to sum
@@ -282,14 +266,14 @@ class Game:
                     yield [value] + perm
 
     def get_island_permutations(self, island:Island, existing_bridges: List[Bridge]) -> List[List[int]]:
-        all_perms = list(self.get_permutations_to_sum(island.maxBridges, len(island.neighbours), []))
+        all_perms = list(self.get_permutations_to_sum(island.max_bridges, len(island.neighbours), []))
         if (len(island.neighbours) == 1):
-            return [[island.maxBridges]]
-        elif (len(island.neighbours) == 2 and island.maxBridges == 6):
+            return [[island.max_bridges]]
+        elif (len(island.neighbours) == 2 and island.max_bridges == 6):
             return [[3,3]]
-        elif (len(island.neighbours) == 3 and island.maxBridges == 9):
+        elif (len(island.neighbours) == 3 and island.max_bridges == 9):
             return [[3,3,3]]
-        elif (len(island.neighbours) == 4 and island.maxBridges == 12):
+        elif (len(island.neighbours) == 4 and island.max_bridges == 12):
             return [[3,3,3,3]]
 
         perms: List[List[int]] = []
@@ -306,16 +290,15 @@ class Game:
 
     def get_number_of_bridges_at_island(self, island:Island, built_bridges: List[Bridge]) -> int:
         count = sum([bridge.count for bridge in built_bridges if (bridge.to_island == island or bridge.from_island == island)])
-        # count = sum(bridge.count for bridge in attached_bridges)
         return count
 
     def get_unfilled_neighbours_count(self, island:Island, built_bridges: List[Bridge]) -> int:
 
         count = 0
         for neighbour in island.neighbours:
-            logging.debug(f"Checking number of bridges at: {neighbour.maxBridges}:({neighbour.row}, {neighbour.col})")
-            if neighbour.maxBridges == self.get_number_of_bridges_at_island(neighbour, built_bridges):
-                logging.debug(f"Skipping at: {neighbour.maxBridges}:({neighbour.row}, {neighbour.col})")
+            logging.debug(f"Checking number of bridges at: {neighbour.max_bridges}:({neighbour.row}, {neighbour.col})")
+            if neighbour.max_bridges == self.get_number_of_bridges_at_island(neighbour, built_bridges):
+                logging.debug(f"Skipping at: {neighbour.max_bridges}:({neighbour.row}, {neighbour.col})")
                 continue
             count += 1
         return count
@@ -324,9 +307,8 @@ class Game:
         sortedIslands = []
         #Prioritise maxed islands
         for island in remaining_islands:
-            remaining_weight = island.maxBridges - self.get_number_of_bridges_at_island(island, built_bridges)
-            # open_neighbours = self.get_unfilled_neighbours_count(island, built_bridges)
-            open_neighbours = len([neighbour for neighbour in island.neighbours if self.get_number_of_bridges_at_island(neighbour, built_bridges) == neighbour.maxBridges])
+            remaining_weight = island.max_bridges - self.get_number_of_bridges_at_island(island, built_bridges)
+            open_neighbours = len([neighbour for neighbour in island.neighbours if self.get_number_of_bridges_at_island(neighbour, built_bridges) == neighbour.max_bridges])
             #Check for maxed corners
             if (open_neighbours == 2 and \
                 (remaining_weight == 6)):
@@ -347,7 +329,7 @@ class Game:
             if (island not in sortedIslands):
                 sortedIslands.append(island)
         for island in sortedIslands:
-            logging.debug(f"{island.maxBridges}:({island.row}, {island.col})")
+            logging.debug(f"{island.max_bridges}:({island.row}, {island.col})")
         return sortedIslands
 
     def isGameComplete(self, bridges: List[Bridge]):
@@ -357,7 +339,7 @@ class Game:
                     bridge.to_island == island)
                 ))]
             count = sum([bridge.count for bridge in island_bridges])
-            if count != island.maxBridges:
+            if count != island.max_bridges:
                 return False
         return True
 

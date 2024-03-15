@@ -22,7 +22,6 @@ class Island:
         self.col = col
         self.max_bridges = max_bridges
         self.neighbours: List[Island] = []
-        self.bridges = {}
 
     def show(self):
         if (self.max_bridges == 10):
@@ -83,6 +82,7 @@ class Game:
         self.nrows = nrows
         self.ncols = ncols
         self.islands = islands
+        self.bridges = {}
 
     def show_game(self, bridges: List[Bridge]):
         for row in range(self.nrows):
